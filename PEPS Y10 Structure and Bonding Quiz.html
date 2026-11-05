@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structure and Bonding Quiz</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--ink:#1b2333;--muted:#5f6b7f;--line:#d9dfea;--brand:#1f4e8c;--ok:#1b7f4b;--okbg:#e6f5ec;--bad:#b3261e;--badbg:#fbe9e7;--sel:#e8f0fb}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10151f;--card:#18202e;--ink:#e8edf6;--muted:#9aa7bd;--line:#2b3649;--brand:#7fb0ee;--ok:#5fd394;--okbg:#14301f;--bad:#ff8a80;--badbg:#3a1a18;--sel:#1e2b42}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+header{text-align:center;margin-bottom:18px}
+header .school{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:26px;margin:4px 0}
+header p{margin:4px 0;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
+label{display:block;font-weight:600;margin:10px 0 4px}
+input[type=text]{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-size:16px}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:12px 20px;font-weight:600;min-height:44px}
+.btn.sec{background:transparent;color:var(--brand);border:1px solid var(--brand)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-bottom:14px}
+.bar i{display:block;height:100%;background:var(--brand);width:0;transition:width .3s}
+.meta{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin-bottom:8px}
+.q{font-size:19px;font-weight:600;margin:6px 0 14px}
+.opt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;min-height:48px}
+.opt:hover:not(:disabled){background:var(--sel)}
+.opt .k{font-weight:700;color:var(--brand);min-width:20px}
+.opt.right{background:var(--okbg);border-color:var(--ok)}
+.opt.wrong{background:var(--badbg);border-color:var(--bad)}
+.fb{margin-top:10px;padding:12px 14px;border-radius:10px;border:1px solid var(--line)}
+.fb.ok{background:var(--okbg);border-color:var(--ok)}
+.fb.no{background:var(--badbg);border-color:var(--bad)}
+.score{font-size:46px;font-weight:700;text-align:center;margin:4px 0}
+.band{text-align:center;font-weight:700;color:var(--brand);font-size:20px}
+ul.tips{padding-left:20px}
+.rev{border-top:1px solid var(--line);padding:12px 0}
+.rev:first-child{border-top:0}
+.hidden{display:none}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+sub,sup{line-height:0}
+@media print{body{background:#fff;color:#000}.btn,.row{display:none}.card{border:1px solid #999}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="school">Providence English Private School</div>
+<h1>Structure and Bonding Quiz</h1>
+<p>Year 10 IGCSE Chemistry · Miss Emmah M. Tamnai</p>
+</header>
+
+<section id="start" class="card">
+<p>20 multiple-choice questions on ionic, covalent and metallic bonding and on structure and properties. You get feedback after every answer.</p>
+<label for="nm">Name</label><input id="nm" type="text" autocomplete="name">
+<label for="cl">Class</label><input id="cl" type="text" placeholder="e.g. 10B">
+<p style="margin-top:16px"><button class="btn" id="go" disabled>Start quiz</button></p>
+</section>
+
+<section id="play" class="card hidden">
+<div class="meta"><span id="cnt"></span><span id="sc"></span></div>
+<div class="bar"><i id="pg"></i></div>
+<div class="q" id="qt"></div>
+<div id="opts"></div>
+<div id="fb" class="fb hidden" role="status" aria-live="polite"></div>
+<p style="margin-top:14px"><button class="btn hidden" id="next">Next question</button></p>
+</section>
+
+<section id="end" class="hidden">
+<div class="card">
+<div id="who" style="text-align:center;color:var(--muted)"></div>
+<div class="score" id="fin"></div>
+<div class="band" id="band"></div>
+<p id="bandtxt" style="text-align:center;color:var(--muted)"></p>
+<div class="row" style="justify-content:center">
+<button class="btn" id="again">Try again</button>
+<button class="btn sec" onclick="window.print()">Print / save result</button>
+</div>
+</div>
+<div class="card"><h2 style="margin-top:0;font-size:18px">Next steps</h2><ul class="tips" id="tips"></ul></div>
+<div class="card"><h2 style="margin-top:0;font-size:18px">Questions to review</h2><div id="review"></div></div>
+</section>
+</div>
+
+<script>
+var Q=[
+{q:"Ionic bonding happens between:",o:["two non-metals","a metal and a non-metal","two metals","two noble gases"],a:1,e:"A metal transfers electrons to a non-metal, forming positive and negative ions."},
+{q:"A sodium atom becomes a Na<sup>+</sup> ion by:",o:["gaining one electron","losing one electron","sharing one electron","losing one proton"],a:1,e:"Sodium (2,8,1) loses its outer electron to form Na<sup>+</sup> (2,8)."},
+{q:"What is the electronic structure of a chloride ion, Cl<sup>−</sup>?",o:["2,8,7","2,8,8","2,8,6","2,8"],a:1,e:"A chlorine atom (2,8,7) gains one electron, so Cl<sup>−</sup> is 2,8,8."},
+{q:"What is the formula of magnesium chloride?",o:["MgCl","Mg<sub>2</sub>Cl","MgCl<sub>2</sub>","Mg<sub>2</sub>Cl<sub>2</sub>"],a:2,e:"Mg<sup>2+</sup> needs two Cl<sup>−</sup> to balance the charge: MgCl<sub>2</sub>."},
+{q:"What is the formula of aluminium oxide?",o:["AlO","Al<sub>2</sub>O<sub>3</sub>","Al<sub>3</sub>O<sub>2</sub>","AlO<sub>3</sub>"],a:1,e:"Al<sup>3+</sup> and O<sup>2−</sup>: 2 × 3+ = 6+ and 3 × 2− = 6−, so Al<sub>2</sub>O<sub>3</sub>."},
+{q:"Why does sodium chloride have a high melting point?",o:["The molecules have strong covalent bonds","There are strong electrostatic forces between oppositely charged ions in a giant lattice","It contains delocalised electrons","The atoms share electrons in layers"],a:1,e:"A lot of energy is needed to overcome the strong electrostatic attraction between the ions."},
+{q:"Sodium chloride conducts electricity when:",o:["solid","molten or dissolved in water","it is a powder","it is cold"],a:1,e:"The ions are free to move when molten or dissolved. In the solid they are fixed in the lattice."},
+{q:"A covalent bond is:",o:["the attraction between ions","a shared pair of electrons","a transfer of electrons","the attraction between a metal ion and electrons"],a:1,e:"Non-metal atoms share pairs of electrons."},
+{q:"How many shared pairs of electrons are there in a nitrogen molecule, N<sub>2</sub>?",o:["1","2","3","4"],a:2,e:"N<sub>2</sub> has a triple bond: three shared pairs."},
+{q:"Which molecule contains a double bond?",o:["H<sub>2</sub>O","CH<sub>4</sub>","NH<sub>3</sub>","CO<sub>2</sub>"],a:3,e:"CO<sub>2</sub> is O=C=O, with two double bonds."},
+{q:"Why do simple molecular substances have low melting points?",o:["Their covalent bonds are weak","The forces between molecules are weak","They contain ions","They have delocalised electrons"],a:1,e:"Only weak intermolecular forces are overcome when they melt, so little energy is needed."},
+{q:"Which substance does not conduct electricity as a solid, liquid or gas?",o:["copper","graphite","methane, CH<sub>4</sub>","molten sodium chloride"],a:2,e:"Methane is simple molecular: no ions and no free electrons."},
+{q:"Diamond is very hard because:",o:["it has weak forces between layers","each carbon atom forms four strong covalent bonds in a giant structure","it has delocalised electrons","it contains ions"],a:1,e:"Each carbon is bonded to four others throughout the giant structure."},
+{q:"Graphite conducts electricity because it has:",o:["ions that are free to move","delocalised electrons","weak intermolecular forces","four bonds per carbon atom"],a:1,e:"Each carbon forms three bonds, leaving one electron delocalised between the layers."},
+{q:"Diamond and graphite are:",o:["isotopes of carbon","allotropes of carbon","compounds of carbon","ions of carbon"],a:1,e:"Allotropes are different structural forms of the same element."},
+{q:"Metallic bonding is the attraction between:",o:["positive ions and delocalised electrons","positive and negative ions","shared pairs and nuclei","molecules"],a:0,e:"A lattice of positive metal ions sits in a sea of delocalised electrons."},
+{q:"Metals can be bent into shape (malleable) because:",o:["the layers of ions can slide over each other","they contain molecules","the ions repel each other","they have weak bonds between atoms"],a:0,e:"The layers slide but the metallic bond is not broken, because the electrons hold the ions together."},
+{q:"Silicon(IV) oxide, SiO<sub>2</sub>, has a very high melting point because it has:",o:["weak intermolecular forces","a giant covalent structure","ions that are free to move","delocalised electrons"],a:1,e:"Strong covalent bonds extend throughout the giant structure."},
+{q:"How many lone (non-bonding) pairs of electrons are on the oxygen atom in a water molecule?",o:["0","1","2","3"],a:2,e:"Oxygen has 6 outer electrons: 2 are shared in the two O–H bonds and the other 4 form 2 lone pairs."},
+{q:"When water boils, what is overcome?",o:["the covalent bonds between H and O","the intermolecular forces between molecules","the ionic bonds","the metallic bonds"],a:1,e:"Boiling separates the molecules; the covalent bonds inside each molecule stay intact."}
+];
+var $=function(id){return document.getElementById(id)};
+var order,idx,score,missed,locked;
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function chk(){$("go").disabled=!$("nm").value.trim()}
+$("nm").addEventListener("input",chk);
+$("go").onclick=function(){start()};
+$("again").onclick=function(){$("end").classList.add("hidden");start()};
+function start(){order=shuffle(Q.map(function(_,i){return i}));idx=0;score=0;missed=[];$("start").classList.add("hidden");$("play").classList.remove("hidden");show()}
+function show(){
+  locked=false;var n=order[idx],q=Q[n];
+  $("cnt").textContent="Question "+(idx+1)+" of "+Q.length;$("sc").textContent="Score: "+score;
+  $("pg").style.width=(idx/Q.length*100)+"%";
+  $("qt").innerHTML=q.q;$("fb").className="fb hidden";$("next").classList.add("hidden");
+  var idxs=shuffle(q.o.map(function(_,i){return i}));var h="";
+  idxs.forEach(function(oi,k){h+='<button class="opt" data-o="'+oi+'"><span class="k">'+"ABCD"[k]+'</span><span>'+q.o[oi]+'</span></button>'});
+  $("opts").innerHTML=h;
+  Array.prototype.forEach.call(document.querySelectorAll(".opt"),function(b){b.onclick=function(){pick(b)}});
+}
+function pick(b){
+  if(locked)return;locked=true;var n=order[idx],q=Q[n],c=+b.dataset.o,ok=c===q.a;
+  Array.prototype.forEach.call(document.querySelectorAll(".opt"),function(x){x.disabled=true;if(+x.dataset.o===q.a)x.classList.add("right")});
+  if(ok){score++}else{b.classList.add("wrong");missed.push(n)}
+  var fb=$("fb");fb.className="fb "+(ok?"ok":"no");
+  fb.innerHTML="<strong>"+(ok?"Correct.":"Not quite.")+"</strong> "+q.e;
+  $("sc").textContent="Score: "+score;
+  $("next").textContent=idx===Q.length-1?"See my result":"Next question";$("next").classList.remove("hidden");$("next").focus();
+}
+$("next").onclick=function(){idx++;if(idx>=Q.length)finish();else show()};
+function finish(){
+  $("play").classList.add("hidden");$("end").classList.remove("hidden");
+  var pct=Math.round(score/Q.length*100);
+  $("who").textContent=$("nm").value.trim()+($("cl").value.trim()?" · "+$("cl").value.trim():"");
+  $("fin").textContent=score+" / "+Q.length+" ("+pct+"%)";
+  var b,t,tips;
+  if(pct>=85){b="Exceeding";t="Excellent understanding of structure and bonding.";tips=["Try six-mark questions comparing two structures (for example NaCl and CO<sub>2</sub>).","Use ‘because’ to link every property to the structure and the forces.","Challenge yourself with unfamiliar substances and predict their properties."]}
+  else if(pct>=65){b="Secure";t="Good understanding. A few ideas need tightening.";tips=["Finish every explanation with the reason: the type of particle and the strength of the forces.","Practise dot-and-cross diagrams for molecules with double and triple bonds.","Revise the review list below."]}
+  else if(pct>=45){b="Developing";t="You know the main ideas. Keep practising.";tips=["Make a table: ionic, simple molecular, giant covalent, metallic. Add melting point and conductivity.","Practise ionic formulae using the charges of the ions.","Learn the key words and write one example for each."]}
+  else{b="Beginning";t="You are starting to build understanding. Ask for help and try again.";tips=["Revise what each type of bonding is: transfer, sharing or delocalised electrons.","Use the learning sheet and key-word cards.","Come to the support session and retake the quiz."]}
+  $("band").textContent=b;$("bandtxt").textContent=t;
+  $("tips").innerHTML=tips.map(function(x){return"<li>"+x+"</li>"}).join("");
+  var r=$("review");
+  if(!missed.length){r.innerHTML="<p>Full marks. Nothing to review.</p>"}
+  else{r.innerHTML=missed.map(function(n){var q=Q[n];return'<div class="rev"><div><strong>'+q.q+'</strong></div><div style="color:var(--ok)">Answer: '+q.o[q.a]+'</div><div style="color:var(--muted)">'+q.e+'</div></div>'}).join("")}
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
